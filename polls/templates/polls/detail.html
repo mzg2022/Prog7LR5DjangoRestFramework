@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вопрос {{ question.id }}</title>
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ question.question_text }}</h1>
+        
+        {% if error_message %}
+            <p class="error">
+                <strong>{{ error_message }}</strong>
+            </p>
+        {% endif %}
+        
+        <form action="{% url 'polls:vote' question.id %}" method="post">
+            {% csrf_token %}
+            
+            <fieldset>
+                <legend><h2>Выберите вариант ответа:</h2></legend>
+                
+                {% for choice in question.choice_set.all %}
+                    <div>
+                        <input type="radio" 
+                               name="choice" 
+                               id="choice{{ forloop.counter }}" 
+                               value="{{ choice.id }}">
+                        <label for="choice{{ forloop.counter }}">
+                            {{ choice.choice_text }}
+                        </label>
+                    </div>
+                {% empty %}
+                    <p>Для этого вопроса пока нет вариантов ответа.</p>
+                {% endfor %}
+            </fieldset>
+            
+            <br>
+            <input type="submit" value="Проголосовать">
+        </form>
+        
+        <div class="nav-links">
+            <a href="{% url 'polls:index' %}">← Вернуться к списку опросов</a>
+            <a href="{% url 'polls:results' question.id %}">Посмотреть текущие результаты</a>
+        </div>
+    </div>
+</body>
+</html>

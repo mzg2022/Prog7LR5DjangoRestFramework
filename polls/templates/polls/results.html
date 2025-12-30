@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты: {{ question.question_text }}</title>
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ question.question_text }}</h1>
+        
+        <h2>Результаты голосования:</h2>
+        
+        <ul class="results-list">
+        {% for choice in question.choice_set.all %}
+            <li>
+                {{ choice.choice_text }} — 
+                <strong>{{ choice.votes }}</strong> 
+                голос{{ choice.votes|pluralize:"а,ов" }}
+                ({% widthratio choice.votes question.total_votes 100 %}%)
+            </li>
+        {% empty %}
+            <li>Нет вариантов ответа для этого вопроса.</li>
+        {% endfor %}
+        </ul>
+        
+        {% with total=question.total_votes %}
+            {% if total > 0 %}
+                <p><strong>Всего голосов: {{ total }}</strong></p>
+            {% else %}
+                <p>Еще никто не проголосовал.</p>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="nav-links">
+            <a href="{% url 'polls:detail' question.id %}">Проголосовать снова?</a>
+            <a href="{% url 'polls:index' %}">Вернуться к списку опросов</a>
+        </div>
+    </div>
+</body>
+</html>

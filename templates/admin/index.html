@@ -1,0 +1,36 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+    <h2>📊 Статистика приложения "Опросы"</h2>
+    <p>Всего вопросов: {{ app_list.0.models.0.count }}</p>
+    <p>Всего вариантов ответов: {{ app_list.0.models.1.count }}</p>
+</div>
+
+{{ block.super }}
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related" style="margin-top: 20px;">
+    <div class="module">
+        <h2>Быстрые действия</h2>
+        <ul class="actionlist">
+            <li>
+                <a href="/admin/polls/question/add/" class="addlink">
+                    ➕ Добавить новый вопрос
+                </a>
+            </li>
+            <li>
+                <a href="/polls/" target="_blank">
+                    👁️ Посмотреть сайт
+                </a>
+            </li>
+            <li>
+                <a href="/admin/polls/question/">
+                    📝 Управление вопросами
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

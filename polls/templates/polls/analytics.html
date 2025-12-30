@@ -1,0 +1,249 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block title %}Аналитика опросов{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1><i class="bi bi-graph-up"></i> Аналитика опросов</h1>
+    <p class="text-muted">Поиск и анализ результатов голосований</p>
+    
+    <div class="row">
+        <!-- Левая колонка: Поиск и фильтры -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Поиск опросов</h5>
+                </div>
+                <div class="card-body">
+                    <form id="searchForm">
+                        <div class="mb-3">
+                            <label class="form-label">Дата с:</label>
+                            <input type="date" class="form-control" id="dateFrom">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Дата по:</label>
+                            <input type="date" class="form-control" id="dateTo">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Сортировка:</label>
+                            <select class="form-select" id="sortBy">
+                                <option value="recent">Сначала новые</option>
+                                <option value="oldest">Сначала старые</option>
+                                <option value="popularity">По популярности</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="searchPolls()">
+                            <i class="bi bi-search"></i> Найти
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Список найденных опросов -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Найденные опросы</h5>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    <div id="pollList">
+                        <!-- Список будет заполняться JavaScript -->
+                        <p class="text-muted text-center">Используйте форму для поиска</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Правая колонка: Статистика и диаграммы -->
+        <div class="col-md-8">
+            <div id="statsContainer">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up" style="font-size: 3rem; color: #6c757d;"></i>
+                        <h4 class="mt-3">Выберите опрос для анализа</h4>
+                        <p class="text-muted">Кликните на любой опрос в списке слева, чтобы увидеть подробную статистику</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript для работы с API -->
+<script>
+// Базовая функция для запросов к API
+async function fetchAPI(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        return null;
+    }
+}
+
+// Поиск опросов
+async function searchPolls() {
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    const sortBy = document.getElementById('sortBy').value;
+    
+    // Формируем URL с параметрами
+    let url = '/analytics/api/polls/search/';
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    if (sortBy) params.append('sort_by', sortBy);
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    // Показываем индикатор загрузки
+    document.getElementById('pollList').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2">Поиск опросов...</p>
+        </div>
+    `;
+    
+    // Делаем запрос
+    const data = await fetchAPI(url);
+    
+    if (data && data.length > 0) {
+        let html = '<div class="list-group">';
+        data.forEach(poll => {
+            html += `
+                <a href="#" class="list-group-item list-group-item-action" 
+                   onclick="loadPollStats(${poll.id})">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${poll.question_text}</h6>
+                        <small>${new Date(poll.pub_date).toLocaleDateString('ru-RU')}</small>
+                    </div>
+                    <small class="text-muted">Всего голосов: ${poll.total_votes || 0}</small>
+                </a>
+            `;
+        });
+        html += '</div>';
+        document.getElementById('pollList').innerHTML = html;
+    } else {
+        document.getElementById('pollList').innerHTML = `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> По вашему запросу опросы не найдены
+            </div>
+        `;
+    }
+}
+
+// Загрузка статистики по конкретному опросу
+async function loadPollStats(questionId) {
+    // Показываем индикатор загрузки
+    document.getElementById('statsContainer').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2">Загрузка статистики...</p>
+        </div>
+    `;
+    
+    // Загружаем статистику и диаграмму одновременно
+    const [statsData, chartData] = await Promise.all([
+        fetchAPI(`/analytics/api/polls/${questionId}/stats/`),
+        fetchAPI(`/analytics/api/polls/${questionId}/chart/`)
+    ]);
+    
+    if (!statsData) {
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i> Ошибка загрузки статистики
+            </div>
+        `;
+        return;
+    }
+    
+    // Формируем HTML для статистики
+    let html = `
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">${statsData.question_text}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Дата публикации:</strong> ${new Date(statsData.pub_date).toLocaleString('ru-RU')}</p>
+                        <p><strong>Всего голосов:</strong> ${statsData.total_votes}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>Результаты:</h6>
+                                <ul class="list-unstyled">
+    `;
+    
+    statsData.choices.forEach(choice => {
+        const percentage = choice.percentage || 0;
+        html += `
+            <li class="mb-2">
+                <div class="d-flex justify-content-between">
+                    <span>${choice.choice_text}</span>
+                    <span><strong>${choice.votes}</strong> (${percentage}%)</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: ${percentage}%"></div>
+                </div>
+            </li>
+        `;
+    });
+    
+    html += `
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Добавляем диаграмму если есть
+    if (chartData && chartData.chart) {
+        html += `
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Визуализация результатов</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="${chartData.chart}" alt="Диаграмма результатов" 
+                         class="img-fluid" style="max-height: 400px;">
+                    <p class="mt-2 text-muted">Столбчатая диаграмма распределения голосов</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('statsContainer').innerHTML = html;
+}
+
+// Загрузка при старте
+document.addEventListener('DOMContentLoaded', function() {
+    // Показываем последние опросы при загрузке
+    searchPolls();
+});
+</script>
+
+<style>
+.progress-bar {
+    background-color: #4CAF50;
+    transition: width 0.5s ease-in-out;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+</style>
+{% endblock %}

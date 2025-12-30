@@ -1,0 +1,59 @@
+<!-- polls/templates/polls/index.html -->
+{% extends 'polls/base.html' %}
+{% load static %}
+
+{% block title %}Главная страница опросов{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Последние опросы</h1>
+    
+    {% if latest_question_list %}
+        <div class="list-group mt-3">
+        {% for question in latest_question_list %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        <a href="{% url 'polls:detail' question.id %}" class="text-decoration-none">
+                            {{ question.question_text }}
+                        </a>
+                    </h5>
+                    <small>
+                        {% if question.was_published_recently %}
+                            <span class="badge bg-success">Новый!</span>
+                        {% endif %}
+                    </small>
+                </div>
+                <small class="text-muted">
+                    Опубликовано: {{ question.pub_date|date:"d.m.Y H:i" }}
+                </small>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            <p>Нет доступных опросов.</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'polls:create_poll' %}" class="btn btn-primary mt-2">Создать первый опрос</a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        {% if user.is_authenticated %}
+            <a href="{% url 'polls:create_poll' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Создать новый опрос
+            </a>
+        {% else %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Хотите создавать опросы?</h5>
+                    <p class="card-text">Для создания опросов необходимо войти в систему или зарегистрироваться.</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary">Регистрация</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

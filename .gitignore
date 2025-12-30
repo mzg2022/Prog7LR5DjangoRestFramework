@@ -1,0 +1,63 @@
+# .gitignore файл
+
+# Секретные ключи и конфигурации
+.env
+.env.local
+.env.*.local
+secrets/
+keys/
+
+# Базы данных
+*.sqlite3
+*.db
+*.sql
+
+# Питон
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Операционные системы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Временные файлы
+*.tmp
+*.temp
+db.sqlite3
+__pycache__/

@@ -1,0 +1,161 @@
+/* Основные стили для приложения опросов */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Контейнер для контента */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+/* Заголовки */
+h1 {
+    color: #2c3e50;
+    border-bottom: 3px solid #4CAF50;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 25px;
+}
+
+/* Ссылки */
+a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #388E3C;
+    text-decoration: underline;
+}
+
+/* Список вопросов */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background: #f8f9fa;
+    margin: 10px 0;
+    padding: 15px 20px;
+    border-left: 4px solid #4CAF50;
+    border-radius: 5px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Формы */
+form {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+fieldset {
+    border: 2px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+legend {
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 0 10px;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+/* Кнопки */
+input[type="submit"],
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #388E3C;
+}
+
+/* Сообщения об ошибках */
+.error {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #d32f2f;
+    margin: 10px 0;
+}
+
+/* Результаты голосования */
+.results-list {
+    margin: 20px 0;
+}
+
+.results-list li {
+    background: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+    margin: 8px 0;
+}
+
+/* Время публикации */
+small {
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+/* Навигация */
+.nav-links {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.nav-links a {
+    display: inline-block;
+    margin-right: 15px;
+    padding: 8px 16px;
+    background: #f1f8e9;
+    border-radius: 4px;
+}
+
+.nav-links a:hover {
+    background: #e8f5e9;
+}
